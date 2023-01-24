@@ -1,0 +1,90 @@
+buildscript {//构建gradle脚本自身需要的资源，可以声明的资源包依赖、第三方差距、maven仓库地址等
+    ext {
+        //统一版本管理
+        lombokVersion = '1.18.24'
+        springBootVersion = '2.3.9.RELEASE'
+        springCloudeVersion = 'Hoxton.SR10'
+        springCoudAlibabaVersion='2.2.5.RELEASE'
+        mysqlVersion = '8.0.13'
+        mybatisSpringBootVersion = '3.0.1'
+    }
+    repositories {//设置仓库
+        mavenLocal()
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/central' }
+        maven { url 'https://maven.aliyun.com/repository/spring' }
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        mavenCentral()
+    }
+    dependencies {
+        //springboot gradle插件，方便版本管理
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+//plugins {
+//    id 'java'
+//    id "org.springframework.boot" version '2.6.13'
+//    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+//}
+//全局配置，包括root和其子项目
+allprojects {
+    apply plugin:  'java'
+    group 'org.example'
+    version '1.0-SNAPSHOT'
+    sourceCompatibility=11
+    targetCompatibility=11
+    tasks.withType(JavaCompile){
+        options.encoding="UTF-8"
+    }
+    repositories {
+        mavenLocal()
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/central' }
+        maven { url 'https://maven.aliyun.com/repository/spring' }
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        mavenCentral()
+    }
+}
+//配置所有子项目
+subprojects {
+    apply plugin: 'io.spring.dependency-management' //版本管理插件
+   //dependencyManagement版本统一管理，类似maven里面dependencyManagement
+    dependencies {
+        annotationProcessor 'org.projectlombok:lombok'
+        implementation 'org.projectlombok:lombok'
+    }
+    dependencyManagement{
+        dependencies {
+            dependency "org.projectlombok:lombok:${lombokVersion}"
+            dependency "mysql:mysql-connector-java:${mysqlVersion}"
+            dependency "org.mybatis.spring.boot:mybatis-spring-boot-starter:${mybatisSpringBootVersion}"
+        }
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudeVersion}"
+            mavenBom "com.alibaba.cloud:spring-cloud-alibaba-dependencies:${springCoudAlibabaVersion}"
+        }
+    }
+}
+
+repositories {
+    mavenLocal()
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    mavenCentral()
+}
+
+dependencies {
+//    implementation 'org.apache.groovy:groovy:4.0.2'
+//    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+//    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+//    classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+}
+
+test {
+    useJUnitPlatform()
+}
